@@ -54,9 +54,6 @@ class Policy(nn.Module):
         return self.critic(features.permute(1, 0, 2).view(features.size(1), -1))
 
     def evaluate_actions(self, observations, rnn_hidden_states, action):
-        print(observations.shape)
-        print(rnn_hidden_states.shape)
-        print(action.shape)
         features, rnn_hidden_states = self.net(observations, rnn_hidden_states)
         
         distribution = self.action_distribution(features)
@@ -64,12 +61,6 @@ class Policy(nn.Module):
 
         action_log_probs = distribution.log_probs(action)
         distribution_entropy = distribution.entropy().mean()
-
-        print(features.shape)
-        print(rnn_hidden_states.shape)
-        print(value.shape)
-        print(action_log_probs.shape)
-        print(distribution_entropy.shape)
         return value, action_log_probs, distribution_entropy, rnn_hidden_states, distribution
 
 
