@@ -158,7 +158,7 @@ def main():
     _hidden_size = 20
     hidden_size = _hidden_size * len(ob_name_lstm)
 
-    actor_critic = Policy(coord_size, input_size=(len(ob_name_lstm), len(ob_name_scalar)), \
+    actor_critic = Policy(sum(list(model.get_channel_num().values())), input_size=(len(ob_name_lstm), len(ob_name_scalar)), \
     action_space=len(action_space), hidden_size=_hidden_size, window_size=1)
     agent = algo.A2C_ACKTR(
         actor_critic,
