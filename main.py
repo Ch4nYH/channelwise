@@ -144,14 +144,14 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_dataset, args.batch_size, num_workers=args.worker, shuffle = True)
     val_loader = torch.utils.data.DataLoader(val_dataset, args.batch_size, num_workers=args.worker, shuffle = False)
 
-    #model = SimpleModel()
-    model = resnet18(pretrained = args.pretrained)
-    model.fc = nn.Linear(512, args.num_classes)
+    model = SimpleModel()
+    #model = resnet18(pretrained = args.pretrained)
+    #model.fc = nn.Linear(512, args.num_classes)
 
    
     action_space = np.array([0, 1])
-    coord_size = len(model.layers())
-    ob_name_lstm = ["loss", "val_loss", "step"]
+    coord_size = 1
+    ob_name_lstm = ["loss", "val_loss", "step", "mean", "std"]
     ob_name_scalar = []
     num_steps = args.num_steps
     obs_shape = (len(ob_name_lstm) + len(ob_name_scalar) + coord_size, )
@@ -169,7 +169,7 @@ def main():
         alpha=args.alpha,
         max_grad_norm=args.max_grad_norm)
 
-    rollouts = RolloutStorage(num_steps, obs_shape, action_shape=coord_size, hidden_size=hidden_size, num_recurrent_layers=actor_critic.net.num_recurrent_layers)
+    rollouts = RolloutStorage(num_steps, sum(list(model.get_channel_num())), obs_shape, action_shape=coord_size, hidden_size=hidden_size, num_recurrent_layers=actor_critic.net.num_recurrent_layers)
     names = list(map(lambda x: x[0], list(model.named_parameters())))
     optimizer = MixtureOptimizer(model.parameters(), 0.001, writer = writer, layers = model.layers(), names = names)
 

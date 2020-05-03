@@ -200,22 +200,22 @@ class MetaRunner(object):
     def step_run(self, epoch):
         observation, prev_loss, prev_val_loss = self.trainer.observe()
         self.step += self.window_size
-        self.rollouts.obs[0].copy_()
+        self.rollouts.obs[0].copy_(observation)
         episode_rewards = deque(maxlen=100)
         action = None
         while self.step < self.total_steps:
             self.step += self.window_size
             for step in range(self.num_steps):
-                for channel in range(observation.shape[0]):
-                    with torch.no_grad():
-                        value, action, action_log_prob, recurrent_hidden_states, distribution = \
-                        self.ac.act(observation[[channel], ...], self.rollouts.recurrent_hidden_states[(step * 4 + n_channel)])
-                        action = action.squeeze(0)
-                        action_log_prob = action_log_prob.squeeze(0)
-                        value = value.squeeze(0)
-                        for idx in range(len(action)):
-                            self.writer.add_scalar("action/channel_{}".format(n_channel)), action[0], self.step + self.accumulated_step)
-                            self.writer.add_scalar("entropy/channel_{}".format(n_channel)) distribution.distributions[0].entropy(), self.step + self.accumulated_step)
+                with torch.no_grad():
+                    value, action, action_log_prob, recurrent_hidden_states, distribution = \
+                    self.ac.act(self.rollouts.obs[step:step+1] ,self.rollouts.recurrent_hidden_states[step])
+                    action = action.squeeze(0)
+                    action_log_prob = action_log_prob.squeeze(0)
+                    value = value.squeeze(0)
+                    print(action.shape)
+                    #for idx in range(len(action)):
+                    #    self.writer.add_scalar("action/channel_{}".format(n_channel)), action[0], self.step + self.accumulated_step)
+                    #    self.writer.add_scalar("entropy/channel_{}".format(n_channel)) distribution.distributions[0].entropy(), self.step + self.accumulated_step)
                 # ==============
                 # | SET ACTION |
                 # ==============
