@@ -96,7 +96,8 @@ class ChannelWiseOptimizer(object):
                 try:
                     p.grad.data[i, ...].mul_(self.mask[name.split('.')[0] + "_" + str(i)])
                 except KeyError:
-                    print(name.split('.')[0] + "_" + str(i), "not found.")
+                    pass
+                    #print(name.split('.')[0] + "_" + str(i), "not found.")
                 p.data.add_(self.alpha * self.state[p]['mt_hat'] / (torch.sqrt(self.state[p]['vt_hat']) + self.eta))
            
 
