@@ -7,10 +7,10 @@ from collections import defaultdict
 class SimpleModel(nn.Module):
     def __init__(self, num_classes = 10):
         super(SimpleModel, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size = 3, stride = 2, padding = 1)
-        self.conv2 = nn.Conv2d(32, 32, kernel_size = 3, stride = 2, padding = 1)
+        self.conv1 = nn.Conv2d(3, 3, kernel_size = 3, stride = 2, padding = 1)
+        self.conv2 = nn.Conv2d(3, 3, kernel_size = 3, stride = 2, padding = 1)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.l1 = nn.Linear(32, 10)
+        self.l1 = nn.Linear(3, 10)
         self.layers = ['conv1', 'conv2']
     
     def get_channel_num(self):
