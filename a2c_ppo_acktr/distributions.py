@@ -98,7 +98,6 @@ class MultiCategorical(nn.Module):
     def log_probs(self, actions, is_sum=True):
         # actions: (batch, coord)
         log_probs = []
-        print(len(self.distributions))
         for coord in range(len(self.distributions)):
             try:
                 log_probs.append(self.distributions[coord].log_probs(actions[:, coord:coord+1]))
