@@ -109,7 +109,7 @@ class BasicNet(Net):
     def __init__(self, num_channels, input_size=(1, 1), hidden_size=1, window_size=1):
         super().__init__()
         self._coord_size = 1 # one action for each channel
-        self.num_channels
+        self.num_channels = num_channels
         # input_size: (#lstm_input, #mlp_input)
         self._input_size = input_size
         self._hidden_size = hidden_size
