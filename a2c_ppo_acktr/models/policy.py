@@ -59,6 +59,7 @@ class Policy(nn.Module):
         action_log_probs = distribution.log_probs(action)
         distribution_entropy = distribution.entropy().mean()
         value.sum().backward(retain_graph = True)
+        print("Backward")
         return value, action_log_probs, distribution_entropy, rnn_hidden_states, distribution
 
 
