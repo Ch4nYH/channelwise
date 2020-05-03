@@ -209,13 +209,10 @@ class MetaRunner(object):
             for step in range(self.num_steps):
                 with torch.no_grad():
                     value, action, action_log_prob, recurrent_hidden_states, distribution = \
-                    self.ac.act(self.rollouts.obs[step:step+1] ,self.rollouts.recurrent_hidden_states[step])
-                    print(value.shape)
-                    print(action.shape, action_log_prob.shape,recurrent_hidden_states.shape)
+                    self.ac.act(self.rollouts.obs[step:step+1], self.rollouts.recurrent_hidden_states[step])
                     action = action.squeeze(0)
                     action_log_prob = action_log_prob.squeeze(0)
                     value = value.squeeze(0)
-                    print(action.shape)
                     #for idx in range(len(action)):
                     #    self.writer.add_scalar("action/channel_{}".format(n_channel)), action[0], self.step + self.accumulated_step)
                     #    self.writer.add_scalar("entropy/channel_{}".format(n_channel)) distribution.distributions[0].entropy(), self.step + self.accumulated_step)

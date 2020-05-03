@@ -43,7 +43,6 @@ class A2C_ACKTR():
         )
 
         values = values.view(num_steps, num_processes, 1)
-        print(action_log_probs.shape)
         action_log_probs = action_log_probs.view(num_steps, num_processes, 1)
 
         advantages = rollouts.returns[:-1] - values

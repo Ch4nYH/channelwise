@@ -57,13 +57,13 @@ class FixedBernoulli(torch.distributions.Bernoulli):
 
 
 class Categorical(nn.Module):
-    def __init__(self, num_inputs, num_outputs, coord_size=1):
+    def __init__(self, num_inputs, num_outputs, num_channels = 1):
         # num_inputs: #features for each coord
         # num_outputs: action_space
         super(Categorical, self).__init__()
         self.num_inputs = num_inputs
         self.num_outputs = num_outputs
-        self.coord_size = coord_size
+        self.num_channels = num_channels
 
         init_ = lambda m: init(
             m,
@@ -71,17 +71,16 @@ class Categorical(nn.Module):
             lambda x: nn.init.constant_(x, 0),
             gain=0.01)
 
-        self.linear = nn.ModuleList([
+        self.linear = 
             init_(nn.Linear(num_inputs, num_outputs))
-            for _ in range(coord_size)
-        ])
+            
 
     def forward(self, x):
         # x: (coord, batch, *features)
         # will coordinate-wisely return distributions
         distributions = []
-        for coord in range(self.coord_size):
-            dist = FixedCategorical(logits=self.linear[coord](x[coord]))
+        for channel in range(self.num_channels):
+            dist = FixedCategorical(logits = self.linear(x[channel]))
             distributions.append(dist)
         return MultiCategorical(distributions)
 

@@ -14,24 +14,20 @@ from a2c_ppo_acktr.models.rnn_state_encoder import RNNStateEncoder
 
 
 class Policy(nn.Module):
-    def __init__(self, coord_size, input_size=(1, 1), action_space=1, hidden_size=1, window_size=1, action_embedding = 0):
+    def __init__(self, num_channels, input_size=(1, 1), action_space=1, hidden_size=1, window_size=1, action_embedding = 0):
         # input_size: (#lstm_input, #mlp_input)
         super().__init__()
-        # TODO: should change "batch_size" to coord_size
-
-        self.net = BasicNet(coord_size, input_size=(input_size[0], input_size[1]), hidden_size=hidden_size, window_size=window_size)
+        self.net = BasicNet(num_channels, input_size=(input_size[0], input_size[1]), hidden_size = hidden_size, window_size = window_size)
         # will coordinate-wisely return distributions
-        self.action_distribution = Categorical(input_size[0]*hidden_size+input_size[1]+1, action_space, coord_size=coord_size)
-        self.critic = CriticHead(coord_size * (input_size[0]*hidden_size+input_size[1]+1))
+        self.action_distribution = Categorical(input_size[0]*hidden_size+input_size[1]+1, action_space, num_channels = num_channels)
+        self.critic = CriticHead(num_channels * (input_size[0]*hidden_size+input_size[1]+1))
         self.recurrent_hidden_state_size = hidden_size
-        self.coord_size = coord_size
+        self.num_channels = num_channels
         self.input_size = input_size
         self.action_space = action_space
         self.hidden_size = hidden_size
         self.window_size = window_size
         self.action_embedding_size = action_embedding
-        #if (self.action_embedding_size > 0):
-        #    self.action_embedding = nn.Embedding(action_space, self.action_embedding_size)
 
     def forward(self, *x):
         raise NotImplementedError
@@ -58,7 +54,7 @@ class Policy(nn.Module):
 
     def get_value(self, observations, rnn_hidden_states):
         features, _ = self.net(observations, rnn_hidden_states)
-        # features = features.view(-1, self.batch_size * self.recurrent_hidden_state_size)
+        
         return self.critic(features.permute(1, 0, 2).view(features.size(1), -1))
 
     def evaluate_actions(self, observations, rnn_hidden_states, action):
@@ -66,7 +62,7 @@ class Policy(nn.Module):
         print(rnn_hidden_states.shape)
         print(action.shape)
         features, rnn_hidden_states = self.net(observations, rnn_hidden_states)
-        # features = features.view(-1, self.batch_size * self.recurrent_hidden_state_size)
+        
         distribution = self.action_distribution(features)
         value = self.critic(features.permute(1, 0, 2).contiguous().view(features.size(1), -1))
 
@@ -110,15 +106,16 @@ class Net(nn.Module, metaclass=abc.ABCMeta):
 
 
 class BasicNet(Net):
-    def __init__(self, coord_size, input_size=(1, 1), hidden_size=1, window_size=1):
+    def __init__(self, num_channels, input_size=(1, 1), hidden_size=1, window_size=1):
         super().__init__()
-        self._coord_size = coord_size
+        self._coord_size = 1 # one action for each channel
+        self.num_channels
         # input_size: (#lstm_input, #mlp_input)
         self._input_size = input_size
         self._hidden_size = hidden_size
         self._window_size = window_size
         self.state_encoder = nn.ModuleList([
-            RNNStateEncoder(input_size=window_size, hidden_size=self._hidden_size)
+            RNNStateEncoder(input_size = window_size, hidden_size=self._hidden_size)
             for _ in range(input_size[0])
         ])
         self.train()
@@ -145,9 +142,9 @@ class BasicNet(Net):
         # outputs: (seq_len, batch(1), hidden_size * #lstm_input + #scalar_input)
         outputs = torch.cat(outputs + [observations[:, :, self._input_size[0]*self._window_size:self._input_size[0]*self._window_size+self._input_size[1]]], dim=2)
         # add LR feature for each coord
-        outputs_LR = []
+        outputs_feature = []
         for coord in range(-self._coord_size, 0):
-            outputs_LR.append(torch.cat([outputs, observations[:, :, observations.size(2)+coord:observations.size(2)+coord+1]], dim=2))
-        outputs_LR = torch.stack(outputs_LR, dim=0) # (coord, seq_len, 1, hidden_size * #lstm_input + #scalar_input + 1)
-        outputs_LR = outputs_LR.view(self._coord_size, -1, outputs_LR.size(-1)) # (coord, seq_len * 1, hidden_size * #lstm_input + #scalar_input + 1)
-        return outputs_LR, rnn_hidden_states
+            outputs_feature.append(torch.cat([outputs, observations[:, :, observations.size(2)+coord:observations.size(2)+coord+1]], dim = 2))
+        outputs_feature = torch.stack(outputs_feature, dim = 0) # (coord, seq_len, 1, hidden_size * #lstm_input + #scalar_input + 1)
+        outputs_feature = outputs_feature.view(self.num_channels, -1, outputs_feature.size(-1)) # (coord, seq_len * 1, hidden_size * #lstm_input + #scalar_input + 1)
+        return outputs_feature, rnn_hidden_states
