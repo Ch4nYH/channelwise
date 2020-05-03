@@ -255,7 +255,6 @@ class MetaRunner(object):
             for step in range(self.num_steps):
                 with torch.no_grad():
                     self.step += self.window_size
-                    print(prev_hidden.device)
                     value, action, action_log_prob, prev_hidden, distribution = \
                     self.ac.act(observation.unsqueeze(0).cpu(), prev_hidden, deterministic = True)
                     action = action.squeeze(0)
