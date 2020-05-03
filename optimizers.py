@@ -72,7 +72,7 @@ class ChannelWiseOptimizer(object):
         self.names = names
         self.beta1 = beta1
         self.beta2 = beta2
-    def mask(self, name, value):
+    def set_mask(self, name, value):
         self.mask[name] = value
         
     def step(self):

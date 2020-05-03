@@ -216,7 +216,7 @@ class MetaRunner(object):
                     action_log_prob = action_log_prob.squeeze(0)
                     value = value.squeeze(0)
                     for idx in range(len(action)):
-                        self.trainer.get_optimizer().mask(self.channel_names[idx], action[idx])
+                        self.trainer.get_optimizer().set_mask(self.channel_names[idx], action[idx])
                         self.writer.add_scalar("action/{}".format(channel_names[idx]), action[idx], self.step + self.accumulated_step)
                         self.writer.add_scalar("entropy/{}".format(channel_names[idx]), distribution.distributions[idx].entropy(), self.step + self.accumulated_step)
                         self.prev_action = action
