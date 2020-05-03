@@ -78,7 +78,9 @@ class Categorical(nn.Module):
         # x: (coord, batch, *features)
         # will coordinate-wisely return distributions
         distributions = []
+        print(self.num_channels)
         for channel in range(self.num_channels):
+            print(channel)
             dist = FixedCategorical(logits = self.linear(x[channel]))
             distributions.append(dist)
         return MultiCategorical(distributions)
