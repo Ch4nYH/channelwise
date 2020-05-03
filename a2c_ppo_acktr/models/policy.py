@@ -45,9 +45,7 @@ class Policy(nn.Module):
             action = distribution.mode()
         else:
             action = distribution.sample()
-        print(action.shape)
         action_log_probs = distribution.log_probs(action)
-        print(action_log_probs.shape)
         return value, action, action_log_probs, rnn_hidden_states, distribution
 
     def get_value(self, observations, rnn_hidden_states):
