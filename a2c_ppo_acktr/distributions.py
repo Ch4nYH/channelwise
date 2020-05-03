@@ -64,7 +64,6 @@ class Categorical(nn.Module):
         self.num_inputs = num_inputs
         self.num_outputs = num_outputs
         self.num_channels = num_channels
-        print(num_channels)
         init_ = lambda m: init(
             m,
             nn.init.orthogonal_,
@@ -78,7 +77,6 @@ class Categorical(nn.Module):
         # x: (coord, batch, *features)
         # will coordinate-wisely return distributions
         distributions = []
-        print(self.num_channels)
         for channel in range(self.num_channels):
             dist = FixedCategorical(logits = self.linear(x[channel]))
             distributions.append(dist)
