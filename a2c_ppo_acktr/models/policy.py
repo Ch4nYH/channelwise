@@ -115,9 +115,6 @@ class BasicNet(Net):
     def forward(self, observations, rnn_hidden_states):
         # observation: (seq_len, batch_size, #lstm_input * window + #scalar_input + #actions * 1(LR))
         # rnn_hidden_states: (#lstm_input * hidden_size)
-        print(observations.shape)
-        print(rnn_hidden_states.shape)
-        
         outputs = []
         rnn_hidden_states_new = []
         # coordinate-wise
@@ -134,5 +131,4 @@ class BasicNet(Net):
             outputs_feature.append(torch.cat([outputs, observations[:, :, observations.size(2)+coord:observations.size(2)+coord+1]], dim = 2))
         outputs_feature = torch.stack(outputs_feature, dim = 0) # (coord, seq_len, 1, hidden_size * #lstm_input + #scalar_input + 1)
         outputs_feature = outputs_feature.view(self.num_channels, -1, outputs_feature.size(-1)) # (coord, seq_len * 1, hidden_size * #lstm_input + #scalar_input + 1)
-        print(outputs_feature.shape)
         return outputs_feature, rnn_hidden_states
