@@ -70,7 +70,7 @@ class MetaTrainer(object):
         optimizee_step = [torch.tensor(step).cuda() for step in optimizee_step]
         val_losses = [sum(val_losses) / len(val_losses)]
         observation = torch.stack(losses + optimizee_step + val_losses, dim=0)
-        
+        prev_action = torch.tensor(list(self.get_optimizer().mask.values()))
         # prev_action = xxxxx # previous action = ?
         # ==============
         # | GET ACTION |
@@ -181,6 +181,8 @@ class MetaRunner(object):
         self.gamma = 0.99
         self.gae_lambda = 0.95
         self.accumulated_step = 0
+        self.channel_names = self.trainer.model.get_channel_names()
+        
     def save(self):
         torch.save(self.ac, self.savepath)
 
@@ -213,6 +215,11 @@ class MetaRunner(object):
                     action = action.squeeze(0)
                     action_log_prob = action_log_prob.squeeze(0)
                     value = value.squeeze(0)
+                    for idx in range(len(action)):
+                        self.trainer.get_optimizer().mask(self.channel_names[i], action[i])
+                        self.writer.add_scalar("action/{}".format(channel_names[i]), action[i], self.step + self.accumulated_step)
+                        self.writer.add_scalar("entropy/{}".format(channel_names[i]), distribution.distributions[i].entropy(), self.step + self.accumulated_step)
+                        self.prev_action = action
                     #for idx in range(len(action)):
                     #    self.writer.add_scalar("action/channel_{}".format(n_channel)), action[0], self.step + self.accumulated_step)
                     #    self.writer.add_scalar("entropy/channel_{}".format(n_channel)) distribution.distributions[0].entropy(), self.step + self.accumulated_step)

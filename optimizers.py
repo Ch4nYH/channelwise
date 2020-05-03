@@ -72,8 +72,8 @@ class ChannelWiseOptimizer(object):
         self.names = names
         self.beta1 = beta1
         self.beta2 = beta2
-    def mask(self, mask):
-        self.mask = mask
+    def mask(self, name, value):
+        self.mask[name] = value
         
     def step(self):
         for name, p in zip(self.names, self.parameters):
@@ -92,8 +92,8 @@ class ChannelWiseOptimizer(object):
             state['mt_hat'] = state['mt'] / (1 - np.power(self.beta1, state['t']))
             state['vt_hat'] = state['vt'] / (1 - np.power(self.beta2, state['t']))
             
-            #for i in range(len(self.mask[name])):
-            #    p.grad.data[i, ...].mul_(self.mask[name][i])
+            for i in range(len(p.grad.shape[0])):
+                p.grad.data[i, ...].mul_(self.mask[name + "_" + str(i)])
             
             p.data.add_(self.alpha * self.state[p]['mt_hat'] / (torch.sqrt(self.state[p]['vt_hat']) + self.eta))
 
