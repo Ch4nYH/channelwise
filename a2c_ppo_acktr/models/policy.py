@@ -33,10 +33,7 @@ class Policy(nn.Module):
         raise NotImplementedError
 
     def act(self, observations, rnn_hidden_states, deterministic=False):
-        print(observations.shape)
-        print(rnn_hidden_states.shape)
         features, rnn_hidden_states = self.net(observations, rnn_hidden_states)
-        print(features.shape)
         distribution = self.action_distribution(features)
         # (coord, seq_len*batch, feature) ==> (seq_len*batch, coord, feature)
         value = self.critic(features.permute(1, 0, 2).view(features.size(1), -1))
