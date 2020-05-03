@@ -9,7 +9,7 @@ import torchvision
 import torchvision.transforms as transforms
 from models import SimpleModel, resnet18
 from trainer import Trainer
-from optimizers import MixtureOptimizer
+from optimizers import ChannelWiseOptimizer
 from meta_trainer import MetaRunner, MetaTrainer
 from a2c_ppo_acktr.models.policy import Policy
 from a2c_ppo_acktr import algo, utils
@@ -97,7 +97,7 @@ def main():
     args = parser.parse_args()
 
 
-    task_name = "{}_da{}_ep{}_bs{}_{}".format(args.optimizer, args.dataset, args.epochs, args.batch_size, args.name)
+    task_name = "da{}_ep{}_bs{}_{}".format(, args.dataset, args.epochs, args.batch_size, args.name)
     writer = tensorboardX.SummaryWriter(os.path.join(args.log_dir, task_name))
 
     data_transforms = {
@@ -171,7 +171,7 @@ def main():
 
     rollouts = RolloutStorage(num_steps, sum(list(model.get_channel_num())), obs_shape, action_shape=coord_size, hidden_size=hidden_size, num_recurrent_layers=actor_critic.net.num_recurrent_layers)
     names = list(map(lambda x: x[0], list(model.named_parameters())))
-    optimizer = MixtureOptimizer(model.parameters(), 0.001, writer = writer, layers = model.layers(), names = names)
+    optimizer = ChannelWiseOptimizer(model.parameters(), 0.001, writer = writer, layers = model.layers(), names = names)
 
     if len(args.gpu) == 0:
         use_cuda = False
