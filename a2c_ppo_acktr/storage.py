@@ -29,7 +29,7 @@ class RolloutStorage(object):
         self.rewards = torch.zeros(self.num_steps, num_channel, 1)
         self.value_preds = torch.zeros(self.num_steps + 1, 1)
         self.returns = torch.zeros(self.num_steps + 1, 1)
-        self.action_log_probs = torch.zeros(self.num_steps, num_channel, 1)
+        self.action_log_probs = torch.zeros(self.num_steps, self.num_channel, 1)
         self.actions = torch.zeros_like(self.actions)
         self.step = 0
         self.to(device)
