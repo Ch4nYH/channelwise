@@ -86,7 +86,7 @@ class MetaTrainer(object):
         
         observation = observation.repeat(channel_stats.shape[0], 1)
         observation = torch.cat([observation, channel_stats], 1)
-        return observation, torch.tensor(losses), torch.tensor(val_losses)
+        return observation.detach(), torch.tensor(losses), torch.tensor(val_losses)
 
     def train_step(self): 
         self.model.train()
