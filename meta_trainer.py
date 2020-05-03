@@ -217,8 +217,8 @@ class MetaRunner(object):
                     value = value.squeeze(0)
                     for idx in range(len(action)):
                         self.trainer.get_optimizer().set_mask(self.channel_names[idx], action[idx])
-                        self.writer.add_scalar("action/{}".format(channel_names[idx]), action[idx], self.step + self.accumulated_step)
-                        self.writer.add_scalar("entropy/{}".format(channel_names[idx]), distribution.distributions[idx].entropy(), self.step + self.accumulated_step)
+                        self.writer.add_scalar("action/{}".format(self.channel_names[idx]), action[idx], self.step + self.accumulated_step)
+                        self.writer.add_scalar("entropy/{}".format(self.channel_names[idx]), distribution.distributions[idx].entropy(), self.step + self.accumulated_step)
                         self.prev_action = action
                     #for idx in range(len(action)):
                     #    self.writer.add_scalar("action/channel_{}".format(n_channel)), action[0], self.step + self.accumulated_step)
