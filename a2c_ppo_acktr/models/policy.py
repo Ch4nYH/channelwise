@@ -51,7 +51,7 @@ class Policy(nn.Module):
         return self.critic(features.permute(1, 0, 2).view(features.size(1), -1))
 
     def evaluate_actions(self, observations, rnn_hidden_states, action):
-        features, rnn_hidden_states = self.net(observations, rnn_hidden_states)
+        features, rnn_hidden_states = self.net(observations, rnn_hidden_states.detach())
         
         distribution = self.action_distribution(features)
         value = self.critic(features.permute(1, 0, 2).contiguous().view(features.size(1), -1))
