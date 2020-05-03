@@ -62,13 +62,16 @@ class MixtureOptimizer(object):
                 
                 
 class ChannelWiseOptimizer(object):
-    def __init__(self, parameters, alpha = 0.001):
+    def __init__(self, parameters, names, alpha = 0.001, beta1 = 0.9, beta2 = 0.999):
         param = list(parameters)
         self.parameters = param
         self.alpha = alpha
         self.mask = defaultdict()
         self.state = defaultdict(dict)
         self.eta = 1e-8
+        self.names = names
+        self.beta1 = beta1
+        self.beta2 = beta2
     def mask(self, mask):
         self.mask = mask
         
@@ -89,7 +92,13 @@ class ChannelWiseOptimizer(object):
             state['mt_hat'] = state['mt'] / (1 - np.power(self.beta1, state['t']))
             state['vt_hat'] = state['vt'] / (1 - np.power(self.beta2, state['t']))
             
-            for i in range(len(self.mask[name])):
-                p.grad.data[i, ...].mul_(self.mask[name][i])
+            #for i in range(len(self.mask[name])):
+            #    p.grad.data[i, ...].mul_(self.mask[name][i])
             
-            p.data.add_(self.alpha * self.state[para]['mt_hat'] / (torch.sqrt(self.state[para]['vt_hat']) + self.eta))
+            p.data.add_(self.alpha * self.state[p]['mt_hat'] / (torch.sqrt(self.state[p]['vt_hat']) + self.eta))
+
+    def zero_grad(self):
+        for p in self.parameters:
+            if p.grad is not None:
+                p.grad.detach_()
+                p.grad.zero_()

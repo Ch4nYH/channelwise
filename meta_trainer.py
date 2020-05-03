@@ -75,12 +75,13 @@ class MetaTrainer(object):
         # ==============
         # | GET ACTION |
         # ==============
-
+        prev_action = torch.tensor([0.0])
+        channel_stats = list(self.model.get_channel_stats().values())
+        channel_stats = torch.cat(channel_stats, 0)
         if self.USE_CUDA:
             prev_action = prev_action.cuda()
+            channel_stats = channel_stats.cuda()
         observation = torch.cat([observation, prev_action - 1], dim = 0).unsqueeze(0)
-        channel_stats = list(self.model.get_channel_stats())
-        channel_stats = torch.cat(channel_stats, 0)
         
         
         observation = observation.repeat(channel_stats.shape[0], 1)
@@ -176,7 +177,7 @@ class MetaRunner(object):
         self.writer = kwargs['writer']
         self.savepath = kwargs['savepath']
 
-        self.layers = self.trainer.model.layers()
+        self.layers = self.trainer.model.layers
         self.gamma = 0.99
         self.gae_lambda = 0.95
         self.accumulated_step = 0
@@ -209,6 +210,8 @@ class MetaRunner(object):
                 with torch.no_grad():
                     value, action, action_log_prob, recurrent_hidden_states, distribution = \
                     self.ac.act(self.rollouts.obs[step:step+1] ,self.rollouts.recurrent_hidden_states[step])
+                    print(value.shape)
+                    print(action.shape, action_log_prob.shape,recurrent_hidden_states.shape)
                     action = action.squeeze(0)
                     action_log_prob = action_log_prob.squeeze(0)
                     value = value.squeeze(0)

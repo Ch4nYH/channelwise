@@ -97,7 +97,7 @@ def main():
     args = parser.parse_args()
 
 
-    task_name = "da{}_ep{}_bs{}_{}".format(, args.dataset, args.epochs, args.batch_size, args.name)
+    task_name = "da{}_ep{}_bs{}_{}".format(args.dataset, args.epochs, args.batch_size, args.name)
     writer = tensorboardX.SummaryWriter(os.path.join(args.log_dir, task_name))
 
     data_transforms = {
@@ -169,9 +169,9 @@ def main():
         alpha=args.alpha,
         max_grad_norm=args.max_grad_norm)
 
-    rollouts = RolloutStorage(num_steps, sum(list(model.get_channel_num())), obs_shape, action_shape=coord_size, hidden_size=hidden_size, num_recurrent_layers=actor_critic.net.num_recurrent_layers)
+    rollouts = RolloutStorage(num_steps, sum(list(model.get_channel_num().values())), obs_shape, action_shape=coord_size, hidden_size=hidden_size, num_recurrent_layers=actor_critic.net.num_recurrent_layers)
     names = list(map(lambda x: x[0], list(model.named_parameters())))
-    optimizer = ChannelWiseOptimizer(model.parameters(), 0.001, writer = writer, layers = model.layers(), names = names)
+    optimizer = ChannelWiseOptimizer(model.parameters(), names, 0.001)
 
     if len(args.gpu) == 0:
         use_cuda = False

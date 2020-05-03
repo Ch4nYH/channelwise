@@ -58,6 +58,7 @@ class SimpleModel(nn.Module):
         x = self.conv2(x)
         x = F.relu(x)
         x = self.avgpool(x)
+        x = x.view(x.shape[0], -1)
         x = self.l1(x)
         return x     
 
