@@ -13,7 +13,7 @@ class RolloutStorage(object):
         # observation: (seq_len, batch_size, #lstm_input * window + #scalar_input + #actions * 1(LR))
         self.obs = torch.zeros(num_steps + 1, num_channel, *obs_shape)
         self.recurrent_hidden_states = torch.zeros(num_steps + 1, num_recurrent_layers, num_channel, hidden_size)
-        self.rewards = torch.zeros(num_steps, 1, 1)
+        self.rewards = torch.zeros(num_steps, num_channel, 1)
         self.value_preds = torch.zeros(num_steps + 1, 1)
         self.returns = torch.zeros(num_steps + 1, 1)
         self.action_log_probs = torch.zeros(num_steps, num_channel, 1)
@@ -26,10 +26,10 @@ class RolloutStorage(object):
         device = self.obs.device
         self.obs = torch.zeros_like(self.obs)
         self.recurrent_hidden_states = torch.zeros_like(self.recurrent_hidden_states)
-        self.rewards = torch.zeros(self.num_steps, 1, 1)
+        self.rewards = torch.zeros(self.num_steps, num_channel, 1)
         self.value_preds = torch.zeros(self.num_steps + 1, 1)
         self.returns = torch.zeros(self.num_steps + 1, 1)
-        self.action_log_probs = torch.zeros(self.num_steps, 1)
+        self.action_log_probs = torch.zeros(self.num_steps, num_channel, 1)
         self.actions = torch.zeros_like(self.actions)
         self.step = 0
         self.to(device)
