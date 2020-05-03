@@ -92,7 +92,7 @@ class ChannelWiseOptimizer(object):
             state['mt_hat'] = state['mt'] / (1 - np.power(self.beta1, state['t']))
             state['vt_hat'] = state['vt'] / (1 - np.power(self.beta2, state['t']))
             
-            for i in range(len(p.grad.shape[0])):
+            for i in range(p.grad.shape[0]):
                 p.grad.data[i, ...].mul_(self.mask[name + "_" + str(i)])
             
             p.data.add_(self.alpha * self.state[p]['mt_hat'] / (torch.sqrt(self.state[p]['vt_hat']) + self.eta))
