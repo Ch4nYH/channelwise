@@ -75,7 +75,7 @@ class MetaTrainer(object):
         # ==============
         # | GET ACTION |
         # ==============
-        prev_action = torch.tensor([0.0])
+        prev_action = torch.tensor(list(self.get_optimizer().mask.values()))
         channel_stats = list(self.model.get_channel_stats().values())
         channel_stats = torch.cat(channel_stats, 0)
         if self.USE_CUDA:
